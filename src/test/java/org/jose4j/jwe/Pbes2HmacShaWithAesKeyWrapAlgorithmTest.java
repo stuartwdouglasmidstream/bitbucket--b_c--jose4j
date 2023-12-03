@@ -40,7 +40,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithmTest
 {
     // per http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-23#section-4.8.1.2
     // "A minimum iteration count of 1000 is RECOMMENDED."
-    public static final int MINIMUM_ITERAION_COUNT = 1000;
+    public static final int MINIMUM_ITERATION_COUNT = 1000;
 
     // per tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-23#section-4.8.1.1
     // "A Salt Input value containing 8 or more octets MUST be used"
@@ -104,7 +104,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithmTest
         Headers headers = decryptingJwe.getHeaders();
 
         Long iterationCount = headers.getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
-        assertTrue(iterationCount >= MINIMUM_ITERAION_COUNT);
+        assertTrue(iterationCount >= MINIMUM_ITERATION_COUNT);
 
         String saltInputString = headers.getStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT);
         Base64Url b = new Base64Url();
@@ -117,7 +117,7 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithmTest
     {
         Pbes2HmacShaWithAesKeyWrapAlgorithm pbes2 = new Pbes2HmacShaWithAesKeyWrapAlgorithm.HmacSha256Aes128();
 
-        assertTrue(pbes2.getDefaultIterationCount() >= MINIMUM_ITERAION_COUNT);
+        assertTrue(pbes2.getDefaultIterationCount() >= MINIMUM_ITERATION_COUNT);
         assertTrue(pbes2.getDefaultSaltByteLength() >= MINIMUM_SALT_BYTE_LENGTH);
 
         PbkdfKey key = new PbkdfKey("a password");
