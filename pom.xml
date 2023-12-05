@@ -19,7 +19,7 @@
   
   <groupId>org.bitbucket.b_c</groupId>
   <artifactId>jose4j</artifactId>
-  <version>0.9.4-SNAPSHOT</version>
+  <version>0.9.4</version>
   <packaging>jar</packaging>
   <name>jose4j</name>
   <description>
@@ -258,6 +258,6 @@
     <connection>scm:git:https://bitbucket.org/b_c/jose4j.git</connection>
     <developerConnection>scm:git:ssh://git@bitbucket.org/b_c/jose4j.git</developerConnection>
     <url>https://bitbucket.org/b_c/jose4j</url>
-    <tag>HEAD</tag>
+    <tag>jose4j-0.9.4</tag>
   </scm>
 </project>                                                     
