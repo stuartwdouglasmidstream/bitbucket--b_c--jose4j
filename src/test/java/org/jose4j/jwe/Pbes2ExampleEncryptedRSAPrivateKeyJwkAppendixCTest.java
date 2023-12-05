@@ -17,6 +17,7 @@ package org.jose4j.jwe;
 
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.jca.ProviderContextTest;
+import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jwk.Use;
@@ -33,6 +34,7 @@ import java.security.Key;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.PERMIT;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
 
@@ -90,6 +92,7 @@ public class Pbes2ExampleEncryptedRSAPrivateKeyJwkAppendixCTest
     {
         PbkdfKey key = new PbkdfKey(PASSWORD);
         JsonWebEncryption jwe = new JsonWebEncryption();
+        jwe.setAlgorithmConstraints(new AlgorithmConstraints(PERMIT, KeyManagementAlgorithmIdentifiers.PBES2_HS256_A128KW));
         jwe.setCompactSerialization(CS);
         jwe.setKey(key);
         String payload = jwe.getPayload();

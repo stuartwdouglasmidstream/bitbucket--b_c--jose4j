@@ -1,5 +1,6 @@
 package org.jose4j.jwe;
 
+import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwa.CryptoPrimitive;
 import org.jose4j.jws.JwsTestSupport;
 import org.jose4j.keys.AesKey;
@@ -12,6 +13,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jose4j.jwa.AlgorithmConstraints.ConstraintType.PERMIT;
 
 public class JweCryptoPrimitiveTest
 {
@@ -143,6 +146,7 @@ public class JweCryptoPrimitiveTest
 
         jwe = new JsonWebEncryption();
         jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.PBES2_HS256_A128KW);
+        jwe.setAlgorithmConstraints(new AlgorithmConstraints(PERMIT, KeyManagementAlgorithmIdentifiers.PBES2_HS256_A128KW));
         jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
         PbkdfKey pbkdfKey = new PbkdfKey("Don’t piss me off, Art.");
         jwe.setKey(pbkdfKey);
@@ -150,6 +154,7 @@ public class JweCryptoPrimitiveTest
         compactSerialization = jwe.getCompactSerialization();
 
         jwe = new JsonWebEncryption();
+        jwe.setAlgorithmConstraints(new AlgorithmConstraints(PERMIT, KeyManagementAlgorithmIdentifiers.PBES2_HS256_A128KW));
         jwe.setCompactSerialization(compactSerialization);
         jwe.setKey(pbkdfKey);
         cryptoPrimitive = jwe.prepareDecryptingPrimitive();

@@ -52,6 +52,8 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
     private long defaultIterationCount = 8192L * 8;
     private int defaultSaltByteLength = 12;
 
+    private long maxIterationCount = 2499999L;
+
     public Pbes2HmacShaWithAesKeyWrapAlgorithm(String alg, String hmacAlg, AesKeyWrapManagementAlgorithm keyWrapAlg)
     {
         setAlgorithmIdentifier(alg);
@@ -112,6 +114,11 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
     public CryptoPrimitive prepareForDecrypt(Key managementKey, Headers headers, ProviderContext providerContext) throws JoseException
     {
         Long iterationCount = headers.getLongHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT);
+        if (iterationCount > maxIterationCount)
+        {
+            throw new JoseException("PBES2 iteration count ("+HeaderParameterNames.PBES2_ITERATION_COUNT+"="+
+                    iterationCount+") cannot be more than "+ maxIterationCount+" to avoid excessive resource utilization.");
+        }
         String saltInputString = headers.getStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT);
         Base64Url base64Url = new Base64Url();
         byte[] saltInput = base64Url.base64UrlDecode(saltInputString);
@@ -177,6 +184,16 @@ public class Pbes2HmacShaWithAesKeyWrapAlgorithm  extends AlgorithmInfo implemen
     public void setDefaultSaltByteLength(int defaultSaltByteLength)
     {
         this.defaultSaltByteLength = defaultSaltByteLength;
+    }
+
+    public long getMaxIterationCount()
+    {
+        return maxIterationCount;
+    }
+
+    public void setMaxIterationCount(long maxIterationCount)
+    {
+        this.maxIterationCount = maxIterationCount;
     }
 
     public static class HmacSha256Aes128 extends Pbes2HmacShaWithAesKeyWrapAlgorithm

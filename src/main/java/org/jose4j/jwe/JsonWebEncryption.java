@@ -42,8 +42,12 @@ import java.security.Key;
 public class JsonWebEncryption extends JsonWebStructure
 {
 	public static final short COMPACT_SERIALIZATION_PARTS = 5;
-    private static final AlgorithmConstraints BLOCK_RSA1_5 =
-            new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.BLOCK, KeyManagementAlgorithmIdentifiers.RSA1_5);
+    private static final AlgorithmConstraints DEFAULT_BLOCKED =
+            new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.BLOCK,
+                    KeyManagementAlgorithmIdentifiers.RSA1_5,
+                    KeyManagementAlgorithmIdentifiers.PBES2_HS256_A128KW,
+                    KeyManagementAlgorithmIdentifiers.PBES2_HS384_A192KW,
+                    KeyManagementAlgorithmIdentifiers.PBES2_HS512_A256KW);
 
     private Base64Url base64url = new Base64Url();
     
@@ -62,7 +66,7 @@ public class JsonWebEncryption extends JsonWebStructure
 
     public JsonWebEncryption()
     {
-        setAlgorithmConstraints(BLOCK_RSA1_5);
+        setAlgorithmConstraints(DEFAULT_BLOCKED);
     }
 
     public void setPlainTextCharEncoding(String plaintextCharEncoding)

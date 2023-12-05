@@ -929,6 +929,7 @@ public class JoseCookbookTest
         jwe.setKey(new PbkdfKey(password));
 
         jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.PBES2_HS512_A256KW);
+        jwe.setAlgorithmConstraints(new AlgorithmConstraints(PERMIT, KeyManagementAlgorithmIdentifiers.PBES2_HS512_A256KW));
         jwe.setHeader(HeaderParameterNames.PBES2_SALT_INPUT, "8Q1SzinasR3xchYz6ZZcHA");
         jwe.setHeader(HeaderParameterNames.PBES2_ITERATION_COUNT, 8192L);
         jwe.setHeader("cty", "jwk-set+json");
@@ -990,6 +991,7 @@ public class JoseCookbookTest
         jwe.setKey(new PbkdfKey(password));
 
         jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.PBES2_HS256_A128KW);
+        jwe.setAlgorithmConstraints(new AlgorithmConstraints(PERMIT, KeyManagementAlgorithmIdentifiers.PBES2_HS256_A128KW));
         Headers headers = jwe.getHeaders();
         headers.setStringHeaderValue(HeaderParameterNames.PBES2_SALT_INPUT, "8Q1SzinasR3xchYz6ZZcHA");
         headers.setObjectHeaderValue(HeaderParameterNames.PBES2_ITERATION_COUNT, 8192L);

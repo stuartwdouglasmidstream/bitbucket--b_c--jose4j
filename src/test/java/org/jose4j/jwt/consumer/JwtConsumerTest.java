@@ -1297,6 +1297,7 @@ public class JwtConsumerTest
 
         JwtConsumer firstPassConsumer = new JwtConsumerBuilder()
                 .setDecryptionKeyResolver(decryptionKeyResolver)
+                .setJweAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS)
                 .setSkipAllValidators()
                 .setDisableRequireSignature()
                 .setSkipSignatureVerification()
@@ -1305,6 +1306,7 @@ public class JwtConsumerTest
 
         JwtConsumer consumer = new JwtConsumerBuilder()
                 .setDecryptionKeyResolver(decryptionKeyResolver)
+                .setJweAlgorithmConstraints(AlgorithmConstraints.NO_CONSTRAINTS)
                 .setVerificationKey(sigKey.getPublicKey())
                 .setEvaluationTime(NumericDate.fromSeconds(1420229816))
                 .setExpectedAudience("canada")
