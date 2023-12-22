@@ -26,6 +26,7 @@ import org.jose4j.lang.StringUtil;
 import java.io.Serializable;
 import java.security.Key;
 import java.security.MessageDigest;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -280,6 +281,10 @@ public abstract class JsonWebKey implements Serializable
                 }
 
                 throw new JoseException("Unsupported or unknown public key (alg=" + key.getAlgorithm() +") " + key);
+            }
+            else if (PrivateKey.class.isInstance(key))
+            {
+                throw new JoseException("A JsonWebKey instance needs to be created from a public or symmetric key.");
             }
             else
             {

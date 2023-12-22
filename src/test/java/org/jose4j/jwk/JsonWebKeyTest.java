@@ -75,6 +75,12 @@ public class JsonWebKeyTest
         assertIsRsa(jwk);
     }
 
+    @Test(expected = JoseException.class)
+    public void testFactoryFailWithRsaPrivateKey() throws JoseException
+    {
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(ExampleRsaKeyFromJws.PRIVATE_KEY);
+    }
+
     private void assertIsRsa(JsonWebKey jwk)
     {
         assertTrue(jwk instanceof RsaJsonWebKey);
@@ -87,6 +93,12 @@ public class JsonWebKeyTest
     {
         JsonWebKey jwk = JsonWebKey.Factory.newJwk(ExampleEcKeysFromJws.PUBLIC_256);
         assertIsEllipticCurve(jwk);
+    }
+
+    @Test(expected = JoseException.class)
+    public void testFactoryFailWithEcPrivateKey() throws JoseException
+    {
+        JsonWebKey jwk = JsonWebKey.Factory.newJwk(ExampleEcKeysFromJws.PRIVATE_256);
     }
 
     private void assertIsEllipticCurve(JsonWebKey jwk)
