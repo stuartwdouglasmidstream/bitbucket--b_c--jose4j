@@ -28,6 +28,7 @@ import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.JsonWebKeySet;
 import org.jose4j.jwk.OctJwkGenerator;
 import org.jose4j.jwk.OctetSequenceJsonWebKey;
+import org.jose4j.jwk.OkpJwkGenerator;
 import org.jose4j.jwk.PublicJsonWebKey;
 import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jwk.RsaJwkGenerator;
@@ -60,6 +61,7 @@ import org.junit.Test;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -3376,5 +3378,23 @@ public class JwtConsumerTest
         // should succeed b/c of setSkipVerificationKeyResolutionOnNone and AlgorithmConstraints.NO_CONSTRAINTS
         JwtContext ctx = jwtConsumer.process(jwt);
         assertThat(ctx.getJwtClaims().getSubject(), equalTo("me"));
+    }
+
+    @Test
+    public void messagesFromSomeErroneousContentType() throws Exception
+    {
+        List<String> jots = new ArrayList<>();
+        jots.add("eyJhbGciOiJIUzI1NiIsImN0eSI6IkpXVCJ9.eyJzdWIiOiIxMjlmZnM5MDQiLCJpc3MiOiJJ4oCZbSBzb3JyeSwgdGhpcyBpcyBvdXIgZmFtaWx54oCZcyBmaXJzdCBraWRuYXBwaW5nLiIsImF1ZCI6ImFwLmlvLyIsImV4cCI6MTcwMjQ5ODIxOH0.G6LACGD5YYphNNKY_CQtCJP26WV6mJs_N8iDdnRtoWY");
+        jots.add("eyJhbGciOiJIUzI1NiIsImN0eSI6Imp3dCJ9.eyJzdWIiOiIxMjM0IiwiaXNzIjoiYWJjZCIsImF1ZCI6Imh0dHBzOi8vZXhhbXBsZS5jb20vYXMiLCJpYXQiOjE3MDI0OTc5MTgsImV4cCI6MTcwMjQ5ODIxOH0.xQ04ctSi43BcOOA0-EEIt0E0pRfc_i-yh2fGe3Hl4XQ");
+        jots.add("eyJhbGciOiJIUzI1NiIsImN0eSI6IkpXVCJ9.eyJzdWIiOiIwIiwiaXNzIjoiY3R5b3J0eXAiLCJhdWQiOiJhdWRpZW5jaWEiLCJleHAiOjE3MDI0OTgyMTh9.Br1k416BlD9mTm8fQV0dIEey6encKms6E4GXyoND99c");
+        jots.add("eyJhbGciOiJIUzI1NiIsImN0eSI6IkpXVCJ9.eyJzdWIiOiIyIiwiaXNzIjoiY3R5b3J0eXAiLCJhdWQiOiJ0by53aG9tLml0Lm1heS5jb25jZXJuIiwiZXhwIjoxNzAyNDk5ODg4fQ.wiJE4Agzol_Y3qrEC_gUBM8D1Bf_SH7dZLh1uH07HjQ");
+        jots.add("eyJhbGciOiJIUzI1NiIsImN0eSI6Ikp3VCJ9.eyJzdWIiOiI0MiIsImlzcyI6ImN0eW9ydHlwIiwiYXVkIjoidG8ud2hvbS5pdC5tYXkuY29uY2Vybi4uLiIsImV4cCI6MTcwMjU5OTg4OH0.tLABXGQkW1lucA-9LVFy3CleVtMWvtoo3-28hunTVXY");
+
+        for (String jot : jots)
+        {
+            JwtConsumer c = new JwtConsumerBuilder().build();
+
+            SimpleJwtConsumerTestHelp.expectProcessingFailure(jot, c);
+        }
     }
 }

@@ -75,6 +75,11 @@ public abstract class JsonWebStructure
 
     public static JsonWebStructure fromCompactSerialization(String cs) throws JoseException
     {
+        if (cs.startsWith("{"))
+        {
+            throw new JoseException("The JOSE Compact Serialization is period delimited series of base64url-encoded values, which cannot start with \"{\"");
+        }
+
         JsonWebStructure jsonWebObject;
         String[] parts = CompactSerializer.deserialize(cs);
         if (parts.length == JsonWebEncryption.COMPACT_SERIALIZATION_PARTS)

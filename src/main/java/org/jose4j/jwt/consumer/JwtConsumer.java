@@ -395,15 +395,7 @@ public class JwtConsumer
             }
             catch (JoseException e)
             {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Unable to process");
-                if (!joseObjects.isEmpty())
-                {
-                    sb.append(" nested");
-                }
-                sb.append(" JOSE object (cause: ").append(e).append("): ").append(workingJwt);
-                ErrorCodeValidator.Error error = new ErrorCodeValidator.Error(ErrorCodes.MISCELLANEOUS, sb.toString());
-                throw new InvalidJwtException("JWT processing failed.", error, e, jwtContext);
+                throw newInvalidJwtException("Unable to process", joseObjects, workingJwt, jwtContext, e);
             }
             catch (InvalidJwtException e)
             {
@@ -411,21 +403,29 @@ public class JwtConsumer
             }
             catch (Exception e)
             {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Unexpected exception encountered while processing");
-                if (!joseObjects.isEmpty())
-                {
-                    sb.append(" nested");
-                }
-                sb.append(" JOSE object (").append(e).append("): ").append(workingJwt);
-                ErrorCodeValidator.Error error = new ErrorCodeValidator.Error(ErrorCodes.MISCELLANEOUS, sb.toString());
-                throw new InvalidJwtException("JWT processing failed.", error, e, jwtContext);
+                throw newInvalidJwtException("Unexpected exception encountered while processing", joseObjects, workingJwt, jwtContext, e);
             }
         }
 
         processContext(jwtContext);
         return jwtContext;
     }
+
+    InvalidJwtException newInvalidJwtException(String intro, LinkedList<JsonWebStructure> joseObjects, String workingJwt, JwtContext jwtContext, Exception e)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append(intro);
+        if (!joseObjects.isEmpty())
+        {
+            sb.append(" nested (outer object header ");
+            sb.append(joseObjects.getFirst().getHeaders().getFullHeaderAsJsonString());
+            sb.append(")");
+        }
+        sb.append(" JOSE object (cause: ").append(e).append("): ").append(workingJwt);
+        ErrorCodeValidator.Error error = new ErrorCodeValidator.Error(ErrorCodes.MISCELLANEOUS, sb.toString());
+        return new InvalidJwtException("JWT processing failed.", error, e, jwtContext);
+    }
+
 
     void validate(JwtContext jwtCtx) throws InvalidJwtException
     {
