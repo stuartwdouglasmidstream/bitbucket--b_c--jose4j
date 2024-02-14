@@ -30,7 +30,7 @@ public class SimpleJwkFilter
 
     private static final String[] EMPTY = new String[2];
     private Criteria kid;
-    private Criteria kty;
+    private MultiValueCriteria kty;
     private Criteria use;
     private Criteria alg;
     private Criteria x5t;
@@ -47,7 +47,12 @@ public class SimpleJwkFilter
 
     public void setKty(String expectedKty)
     {
-        kty = new Criteria(expectedKty, false);
+        kty = new MultiValueCriteria(new String[] {expectedKty}, false);
+    }
+
+    public void setKtys(String[] expectedKtys, boolean omittedValueAcceptable)
+    {
+        kty = new MultiValueCriteria(expectedKtys, omittedValueAcceptable);
     }
 
     public void setUse(String expectedUse, boolean omittedValueAcceptable)
@@ -96,7 +101,7 @@ public class SimpleJwkFilter
         for (JsonWebKey jwk : jsonWebKeys)
         {
             boolean match = isMatch(kid, jwk.getKeyId());
-            match &= isMatch(kty, jwk.getKeyType());
+            match &= kty == null || kty.meetsCriteria(jwk.getKeyType());
             match &= isMatch(use, jwk.getUse());
             match &= isMatch(alg, jwk.getAlgorithm());
             String[] thumbs = getThumbs(jwk, allowThumbsFallbackDeriveFromX5c);
