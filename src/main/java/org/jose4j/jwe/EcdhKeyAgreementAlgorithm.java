@@ -66,7 +66,7 @@ public class EcdhKeyAgreementAlgorithm extends AlgorithmInfo implements KeyManag
     {
         setAlgorithmIdentifier(KeyManagementAlgorithmIdentifiers.ECDH_ES);
         setJavaAlgorithm("ECDH"); // or XDH
-        setKeyType(EllipticCurveJsonWebKey.KEY_TYPE);
+        setKeyType(EllipticCurveJsonWebKey.KEY_TYPE); // or "OKP" but not quite ready to make changes at this layer for that
         setKeyPersuasion(KeyPersuasion.ASYMMETRIC);
     }
 

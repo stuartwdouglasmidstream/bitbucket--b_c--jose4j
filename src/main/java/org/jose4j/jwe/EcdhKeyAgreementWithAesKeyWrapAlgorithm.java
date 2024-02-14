@@ -45,7 +45,7 @@ public class EcdhKeyAgreementWithAesKeyWrapAlgorithm extends AlgorithmInfo imple
     {
         setAlgorithmIdentifier(alg);
         setJavaAlgorithm("N/A");
-        setKeyType(EllipticCurveJsonWebKey.KEY_TYPE);
+        setKeyType(EllipticCurveJsonWebKey.KEY_TYPE); // or "OKP" but not quite ready to make changes at this layer for that
         setKeyPersuasion(KeyPersuasion.ASYMMETRIC);
         this.keyWrap = keyWrapAlgorithm;
         this.ecdh = new EcdhKeyAgreementAlgorithm(HeaderParameterNames.ALGORITHM);

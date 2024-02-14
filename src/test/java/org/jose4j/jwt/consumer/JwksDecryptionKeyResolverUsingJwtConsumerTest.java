@@ -20,13 +20,21 @@ import org.jose4j.jwa.JceProviderTestSupport;
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
+import org.jose4j.jwk.EcJwkGenerator;
+import org.jose4j.jwk.EllipticCurveJsonWebKey;
 import org.jose4j.jwk.JsonWebKey;
 import org.jose4j.jwk.JsonWebKeySet;
 import org.jose4j.jwk.OctJwkGenerator;
+import org.jose4j.jwk.OctetKeyPairJsonWebKey;
 import org.jose4j.jwk.OctetSequenceJsonWebKey;
+import org.jose4j.jwk.OkpJwkGenerator;
+import org.jose4j.jws.AlgorithmIdentifiers;
+import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.NumericDate;
+import org.jose4j.keys.EllipticCurves;
+import org.jose4j.keys.XDHKeyUtil;
 import org.jose4j.keys.resolvers.JwksDecryptionKeyResolver;
 import org.jose4j.keys.resolvers.JwksVerificationKeyResolver;
 import org.jose4j.lang.JoseException;
@@ -38,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -49,7 +58,57 @@ import static org.junit.Assert.fail;
 public class JwksDecryptionKeyResolverUsingJwtConsumerTest
 {
 	private static final Logger log = LoggerFactory.getLogger(JwksDecryptionKeyResolverUsingJwtConsumerTest.class);
-	
+
+	@Test
+    public void testResolveOkpKey() throws Exception
+    {
+        // skip this tests if XDH isn't available (before java 11 I think)
+        org.junit.Assume.assumeTrue(new XDHKeyUtil().isAvailable());
+
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("example with OKP encryption key");
+
+        EllipticCurveJsonWebKey signingKey = EcJwkGenerator.generateJwk(EllipticCurves.P256);
+        signingKey.setKeyId(UUID.randomUUID().toString());
+
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
+        jws.setKey(signingKey.getPrivateKey());
+        jws.setKeyIdHeaderValue(signingKey.getKeyId());
+        jws.setPayload(claims.toJson());
+        String signed = jws.getCompactSerialization();
+
+        OctetKeyPairJsonWebKey encryptionKey =
+                OkpJwkGenerator.generateJwk(OctetKeyPairJsonWebKey.SUBTYPE_X25519);
+        encryptionKey.setKeyId(UUID.randomUUID().toString());
+
+        List<JsonWebKey> dhKeys = new ArrayList<>();
+        dhKeys.add(encryptionKey);
+        dhKeys.add(OkpJwkGenerator.generateJwk(OctetKeyPairJsonWebKey.SUBTYPE_X25519));
+        encryptionKey =
+                OkpJwkGenerator.generateJwk(OctetKeyPairJsonWebKey.SUBTYPE_X25519);
+        encryptionKey.setKeyId(UUID.randomUUID().toString());
+        dhKeys.add(encryptionKey);
+
+        JsonWebEncryption jwe = new JsonWebEncryption();
+        jwe.setAlgorithmHeaderValue(KeyManagementAlgorithmIdentifiers.ECDH_ES_A128KW);
+        jwe.setEncryptionMethodHeaderParameter(
+                ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256);
+        jwe.setKey(encryptionKey.getPublicKey());
+        jwe.setKeyIdHeaderValue(encryptionKey.getKeyId());
+        jwe.setContentTypeHeaderValue("JWT");
+        jwe.setPayload(signed);
+        String encrypted = jwe.getCompactSerialization();
+
+        JwtConsumer consumer =
+                new JwtConsumerBuilder()
+                        .setDecryptionKeyResolver(new JwksDecryptionKeyResolver(dhKeys))
+                        .setVerificationKeyResolver(new JwksVerificationKeyResolver(Arrays.asList(new JsonWebKey[]{signingKey})))
+                        .build();
+
+        assertThat(consumer.processToClaims(encrypted).getSubject(), CoreMatchers.equalTo("example with OKP encryption key"));
+    }
+
     @Test
     public void testSymmetricKeysWithDir() throws JoseException, InvalidJwtException, MalformedClaimException
     {
