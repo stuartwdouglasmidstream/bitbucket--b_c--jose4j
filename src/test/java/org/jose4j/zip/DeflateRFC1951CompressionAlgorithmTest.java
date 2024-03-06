@@ -20,11 +20,33 @@ import junit.framework.TestCase;
 import org.jose4j.base64url.Base64Url;
 import org.jose4j.lang.JoseException;
 import org.jose4j.lang.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  */
 public class DeflateRFC1951CompressionAlgorithmTest extends TestCase
 {
+    private static final Logger log = LoggerFactory.getLogger(DeflateRFC1951CompressionAlgorithmTest.class);
+
+    public void testDeflatedDataTooBig() throws JoseException
+    {
+        byte[] data = new byte[100000000]; // will compress very well
+        CompressionAlgorithm ca = new DeflateRFC1951CompressionAlgorithm();
+        byte[] compressed = ca.compress(data);
+        assertTrue(data.length > compressed.length);
+        try
+        {
+            byte[] decompress = ca.decompress(compressed);
+            fail("should not have decompressed b/c too big size " + decompress.length);
+        }
+        catch (JoseException e)
+        {
+            log.debug("Expected exception because this tests going over the max allowed size of decompressed data " + e);
+        }
+    }
+
     public void testRoundTrip() throws JoseException
     {
         String dataString = "test test test test test test test test test test test test test test test test and stuff";
